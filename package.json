@@ -1,0 +1,20 @@
+{
+  "name": "liecord",
+  "version": "1.0.0",
+  "description": "LieCord - A full-featured Discord-like chat application",
+  "main": "index.js",
+  "scripts": {
+    "install-all": "npm install && cd client && npm install",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && nodemon server.js",
+    "client": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "start": "cd server && node server.js"
+  },
+  "keywords": ["chat", "discord", "websocket", "real-time"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

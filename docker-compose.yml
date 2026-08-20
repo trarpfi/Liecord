@@ -1,0 +1,105 @@
+services:
+  # ScyllaDB - Primary database
+  scylla:
+    image: scylladb/scylla:latest
+    container_name: liecord-scylla
+    ports:
+      - "9042:9042"
+      - "9180:9180"
+      - "10000:10000"
+    volumes:
+      - scylla-data:/var/lib/scylla
+      - ./backend/migrations:/migrations
+    command: --smp 2 --memory 2G
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis - Caching and session management
+  redis:
+    image: redis:7-alpine
+    container_name: liecord-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Elasticsearch - Message search
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: liecord-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Backend API (Rust)
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: liecord-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SCYLLA_NODES=scylla:9042
+      - SCYLLA_KEYSPACE=liecord
+      - REDIS_URL=redis://redis:6379
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    env_file:
+      - backend/.env
+    depends_on:
+      scylla:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    volumes:
+      - ./backend/uploads:/app/uploads
+    restart: unless-stopped
+
+  # Frontend (React + TypeScript)
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: liecord-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8080
+      - VITE_WS_URL=ws://localhost:8080
+    depends_on:
+      - backend
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+volumes:
+  scylla-data:
+  redis-data:
+  elasticsearch-data:
+
+networks:
+  default:
+    name: liecord-network

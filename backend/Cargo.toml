@@ -1,0 +1,63 @@
+[package]
+name = "liecord-backend"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+# Async runtime
+tokio = { workspace = true }
+tokio-util = { version = "0.7", features = ["full"] }
+
+# Web framework
+axum = { version = "0.7", features = ["ws", "multipart", "macros"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["fs", "cors", "compression-full", "trace"] }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Database - ScyllaDB
+scylla = { version = "0.13", features = ["cloud", "ssl"] }
+
+# Redis
+redis = { version = "0.24", features = ["tokio-comp", "connection-manager", "streams"] }
+
+# Elasticsearch
+elasticsearch = "8.5"
+
+# Authentication
+jsonwebtoken = "9.2"
+argon2 = "0.5"
+rand = "0.8"
+
+# Utilities
+uuid = { workspace = true }
+chrono = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# HTTP client
+reqwest = { version = "0.11", features = ["json", "multipart"] }
+
+# Environment
+dotenv = "0.15"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# File handling
+mime_guess = "2.0"
+bytes = "1.5"
+
+# WebSocket
+axum-extra = { version = "0.9", features = ["typed-header"] }
+
+# Shared types
+liecord-shared = { path = "../shared" }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

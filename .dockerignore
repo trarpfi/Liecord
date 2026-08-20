@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+
+# Dependencies
+target/
+node_modules/
+client/node_modules/
+client/dist/
+
+# Environment
+.env
+.env.local
+backend/.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+!README.md
+
+# Build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Uploads
+uploads/
+backend/uploads/
