@@ -1,34 +1,3 @@
-# Dependencies
 node_modules/
-server/node_modules/
-client/node_modules/
-
-# Environment variables
 .env
-server/.env
-
-# Uploads
-server/uploads/
-uploads/
-
-# Production build
-client/dist/
-client/build/
-
-# Logs
 *.log
-npm-debug.log*
-logs/
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Testing
-coverage/
